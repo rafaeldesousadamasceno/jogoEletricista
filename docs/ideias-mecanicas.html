@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Survivor do Eletricista — Proposta de Mecânicas</title>
+<meta name="description" content="Proposta inicial de mecânicas para um jogo survivor com protagonista eletricista. Material de discussão com o Game Designer.">
+<style>
+  :root {
+    --bg: #f6f5f0;
+    --surface: #ffffff;
+    --surface-2: #efede5;
+    --ink: #1b1d22;
+    --ink-2: #4b505b;
+    --line: #dcd9cd;
+    --amber: #f5b301;
+    --amber-ink: #7a5600;
+    --amber-soft: #fff4cf;
+    --cyan: #0e7490;
+    --cyan-soft: #dff3f8;
+    --green: #2f8f4e;
+    --red: #c2410c;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1217;
+      --surface: #171b22;
+      --surface-2: #1f242d;
+      --ink: #e9ebef;
+      --ink-2: #a5abb8;
+      --line: #2b313c;
+      --amber: #ffc83d;
+      --amber-ink: #ffd96b;
+      --amber-soft: #2b2410;
+      --cyan: #5fd4f0;
+      --cyan-soft: #11262c;
+      --green: #5cc17f;
+      --red: #ff8a5c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1217;
+    --surface: #171b22;
+    --surface-2: #1f242d;
+    --ink: #e9ebef;
+    --ink-2: #a5abb8;
+    --line: #2b313c;
+    --amber: #ffc83d;
+    --amber-ink: #ffd96b;
+    --amber-soft: #2b2410;
+    --cyan: #5fd4f0;
+    --cyan-soft: #11262c;
+    --green: #5cc17f;
+    --red: #ff8a5c;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- Cabeçalho ---------- */
+  header.hero {
+    padding: 56px 0 40px;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(900px 300px at 85% -10%, color-mix(in srgb, var(--amber) 22%, transparent), transparent 70%),
+      var(--bg);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--amber-ink);
+  }
+  .eyebrow svg { width: 18px; height: 18px; fill: var(--amber); }
+  h1 { font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.1; margin: 12px 0 12px; letter-spacing: -0.02em; }
+  .lead { font-size: 1.15rem; color: var(--ink-2); max-width: 62ch; margin: 0 0 22px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink-2);
+  }
+  .chip.amber { background: var(--amber-soft); border-color: transparent; color: var(--amber-ink); }
+  .chip.cyan  { background: var(--cyan-soft);  border-color: transparent; color: var(--cyan); }
+
+  /* ---------- Navegação ---------- */
+  nav.toc {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.toc .wrap { display: flex; gap: 4px; overflow-x: auto; padding-top: 8px; padding-bottom: 8px; scrollbar-width: thin; }
+  nav.toc a {
+    flex: none; padding: 6px 12px; border-radius: 8px;
+    color: var(--ink-2); text-decoration: none; font-size: 14px; font-weight: 500;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+
+  /* ---------- Seções ---------- */
+  section { padding: 44px 0 8px; }
+  h2 { font-size: 1.6rem; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 12px; }
+  h2 .num {
+    flex: none; font-size: 13px; font-weight: 700; color: var(--amber-ink);
+    background: var(--amber-soft); border-radius: 6px; padding: 2px 8px; font-variant-numeric: tabular-nums;
+  }
+  .sub { color: var(--ink-2); margin: 0 0 22px; max-width: 70ch; }
+  h3 { font-size: 1.05rem; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 12px; padding-left: 1.2em; }
+  li { margin-bottom: 4px; }
+
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 860px) { .g3, .g4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .g2, .g3, .g4 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 18px 8px;
+  }
+  .card > :last-child { margin-bottom: 10px; }
+  .card.pick { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 6px; margin-bottom: 8px;
+    background: var(--surface-2); color: var(--ink-2);
+  }
+  .tag.rec { background: var(--amber); color: #1b1d22; }
+
+  .callout {
+    border-left: 4px solid var(--amber);
+    background: var(--amber-soft);
+    padding: 14px 16px; border-radius: 0 var(--radius) var(--radius) 0;
+    margin: 18px 0;
+  }
+  .callout.cy { border-left-color: var(--cyan); background: var(--cyan-soft); }
+  .callout strong:first-child { display: block; margin-bottom: 2px; }
+
+  .pros, .cons { font-size: 14.5px; }
+  .pros b { color: var(--green); }
+  .cons b { color: var(--red); }
+
+  /* ---------- Tabelas ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 560px; }
+  th, td { text-align: left; padding: 11px 14px; vertical-align: top; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); background: var(--surface-2); }
+  tr:last-child td { border-bottom: 0; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+  td .evo { color: var(--cyan); font-weight: 600; }
+
+  /* ---------- Itens específicos ---------- */
+  .status-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 14px; padding: 0; list-style: none; }
+  .status-list li { margin: 0; padding: 6px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); font-size: 14.5px; }
+  .status-list b { color: var(--cyan); }
+
+  .volt { margin: 10px 0 14px; }
+  .volt-bar { height: 12px; border-radius: 999px; background: linear-gradient(90deg, #2f8f4e 0%, #f5b301 62%, #c2410c 100%); position: relative; }
+  .volt-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+
+  .circuits { display: flex; gap: 18px; flex-wrap: wrap; margin: 8px 0 14px; color: var(--ink-2); }
+  .circuits figure { margin: 0; text-align: center; font-size: 12.5px; }
+  .circuits svg { width: 150px; height: auto; display: block; margin-bottom: 2px; }
+  .circuits .n { fill: var(--amber); stroke: var(--ink); stroke-width: 1.4; }
+  .circuits .w { stroke: var(--cyan); stroke-width: 2.4; fill: none; stroke-linecap: round; }
+
+  .tone h3 { display: flex; align-items: center; gap: 8px; }
+  .tone ul { color: var(--ink-2); font-size: 14.5px; }
+  .tone .boss { margin-top: 6px; font-size: 14.5px; }
+
+  .stat { text-align: center; padding: 14px 8px 10px; }
+  .stat .big { font-size: 2rem; font-weight: 800; line-height: 1; color: var(--amber-ink); font-variant-numeric: tabular-nums; }
+  .stat .lbl { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+
+  ol.questions { list-style: none; padding: 0; counter-reset: q; }
+  ol.questions li {
+    counter-increment: q; position: relative;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px 12px 56px; margin-bottom: 10px;
+  }
+  ol.questions li::before {
+    content: counter(q); position: absolute; left: 14px; top: 14px;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 700; font-size: 14px;
+    background: var(--amber); color: #1b1d22;
+  }
+  ol.questions .hint { display: block; color: var(--ink-2); font-size: 14px; margin-top: 2px; }
+
+  .timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0 16px; padding: 0; list-style: none; }
+  .timeline li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 0; font-size: 14px; }
+  .timeline .min { display: block; font-size: 12px; font-weight: 700; color: var(--amber-ink); text-transform: uppercase; letter-spacing: .05em; }
+  @media (max-width: 760px) { .timeline { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) { .timeline { grid-template-columns: 1fr; } }
+
+  footer { margin-top: 56px; padding: 28px 0 48px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 14px; }
+
+  /* ---------- Impressão ---------- */
+  @media print {
+    :root { --bg: #fff; --surface: #fff; --surface-2: #f3f3f3; --ink: #000; --ink-2: #333; --line: #ccc; }
+    nav.toc { display: none; }
+    header.hero { background: none; padding: 20px 0; }
+    section { padding-top: 22px; break-inside: avoid-page; }
+    .card, tr, ol.questions li, .callout { break-inside: avoid; }
+    .table-wrap { overflow: visible; }
+    table { min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 5 13.2h5.6L9.5 22 19 9.9h-5.7z"/></svg>
+      Documento de discussão · v0.1
+    </span>
+    <h1>Survivor do Eletricista</h1>
+    <p class="lead">Primeira proposta de mecânicas para um jogo no estilo <em>survivor</em> em que o protagonista é um eletricista com poderes elétricos. A ideia é termos algo concreto para reagir, cortar e refinar juntos.</p>
+    <div class="chips">
+      <span class="chip amber">PC (Steam)</span>
+      <span class="chip amber">2D top-down</span>
+      <span class="chip amber">Indie / equipe pequena</span>
+      <span class="chip cyan">Partidas de 15–20 min</span>
+      <span class="chip">Tom: em aberto</span>
+      <span class="chip">Outubro de 2026</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" aria-label="Seções">
+  <div class="wrap">
+    <a href="#visao">Visão</a>
+    <a href="#loop">Loop</a>
+    <a href="#assinatura">Mecânica-assinatura</a>
+    <a href="#sistema">Sistema elétrico</a>
+    <a href="#armas">Ferramentas</a>
+    <a href="#inimigos">Inimigos</a>
+    <a href="#eventos">Eventos</a>
+    <a href="#meta">Meta-progressão</a>
+    <a href="#mvp">MVP</a>
+    <a href="#perguntas">Perguntas</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- 1 -->
+  <section id="visao">
+    <h2><span class="num">01</span> Visão e pilares</h2>
+    <p class="sub">Referências do gênero: Vampire Survivors, Brotato, Halls of Torment. O que já está decidido: PC, 2D top-down, escopo indie. O que está aberto: o <strong>tom</strong> do jogo e a <strong>mecânica-assinatura</strong>.</p>
+
+    <div class="callout">
+      <strong>O desafio central de design</strong>
+      Por que isso é um jogo de <em>eletricista</em> e não só um mago com raios? Todas as ideias abaixo tentam responder isso com o vocabulário real do ofício: circuito, tensão, aterramento, disjuntor, curto, apagão, gato, linha viva.
+    </div>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag">Pilar 1</span>
+        <h3>Eletricidade tem regras, não é só dano</h3>
+        <p>Conduz, acumula, sobrecarrega, aterra. O jogador aprende o “sistema” e o domina.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Pilar 2</span>
+        <h3>Risco × recompensa de tensão</h3>
+        <p>Quanto mais carga, mais poder e mais perigo. O eletricista também leva choque.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Pilar 3</span>
+        <h3>O ofício vira mecânica</h3>
+        <p>Ferramentas, fiação, quadros de luz, ordens de serviço.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Pilar 4</span>
+        <h3>Partida curta e viciante</h3>
+        <p>15–20 minutos, com builds que “quebram” o jogo de forma divertida.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section id="loop">
+    <h2><span class="num">02</span> Loop de jogo</h2>
+    <p class="sub">Base do gênero, com um twist de estrutura.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Dentro da partida</h3>
+        <ul>
+          <li>Movimento com WASD e <strong>ataques automáticos</strong> das ferramentas equipadas.</li>
+          <li>Inimigos em ondas crescentes; derrotá-los solta <strong>faíscas</strong> (XP).</li>
+          <li>Level up: escolhe 1 entre 3–4 opções (ferramenta nova, upgrade ou passiva).</li>
+          <li>Mini-bosses periódicos, boss final e evento de <strong>Apagão</strong> em marcos de tempo.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Fora da partida</h3>
+        <ul>
+          <li>Fim da run rende moeda de meta-progressão.</li>
+          <li>Volta à <strong>Oficina / Van</strong> para gastar a moeda.</li>
+          <li><strong>Twist:</strong> cada run é uma <strong>“Ordem de Serviço”</strong> (local + objetivo + modificadores). Dá variedade e contexto sem custo alto de produção.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section id="assinatura">
+    <h2><span class="num">03</span> Mecânica-assinatura</h2>
+    <p class="sub">O “coração” do jogo. Três candidatas, que não são mutuamente exclusivas.</p>
+
+    <div class="callout cy">
+      <strong>Inclinação inicial</strong>
+      <b>B como base</b> (simples, dá “game feel” imediato) + <b>A como assinatura</b> (identidade forte). <b>C</b> fica para depois do MVP. Quero ouvir o que você acha.
+    </div>
+
+    <div class="grid g3">
+      <article class="card">
+        <span class="tag">Opção A</span>
+        <h3>Circuitos no campo</h3>
+        <p>O jogador (ou as ferramentas) planta <strong>nós</strong> (poste, tomada, transformador) e liga com <strong>fio</strong>. Inimigos que cruzam o fio tomam dano.</p>
+        <div class="circuits" aria-label="Diagramas de circuito em série e em paralelo">
+          <figure>
+            <svg viewBox="0 0 220 50" role="img" aria-label="Circuito em série">
+              <path class="w" d="M20 25H200"/>
+              <circle class="n" cx="20" cy="25" r="9"/><circle class="n" cx="110" cy="25" r="9"/><circle class="n" cx="200" cy="25" r="9"/>
+            </svg>
+            Série
+          </figure>
+          <figure>
+            <svg viewBox="0 0 220 70" role="img" aria-label="Circuito em paralelo">
+              <path class="w" d="M20 35L110 12L200 35M20 35L110 58L200 35"/>
+              <circle class="n" cx="20" cy="35" r="9"/><circle class="n" cx="110" cy="12" r="9"/><circle class="n" cx="110" cy="58" r="9"/><circle class="n" cx="200" cy="35" r="9"/>
+            </svg>
+            Paralelo
+          </figure>
+        </div>
+        <p><strong>Série:</strong> mais dano, mas se um nó cai o circuito inteiro apaga. <strong>Paralelo:</strong> resiliente, dano dividido.</p>
+        <p class="pros"><b>+</b> Identidade fortíssima, profundidade estratégica, mistura leve com tower defense.</p>
+        <p class="cons"><b>−</b> Mais difícil de ler e balancear; exige UI de posicionamento.</p>
+      </article>
+
+      <article class="card pick">
+        <span class="tag rec">Opção B · base sugerida</span>
+        <h3>Tensão / Sobrecarga</h3>
+        <p>Uma barra de <strong>Tensão</strong> sobe ao atacar e coletar. Alta tensão dá bônus grandes de dano e alcance.</p>
+        <div class="volt" aria-hidden="true">
+          <div class="volt-bar"></div>
+          <div class="volt-labels"><span>Seguro</span><span>Potente</span><span>Sobrecarga</span></div>
+        </div>
+        <p>No topo ocorre a <strong>Sobrecarga</strong>: ou você <strong>descarrega</strong> (explosão em área) ou toma choque e fica atordoado. O <strong>aterramento</strong> (haste de terra) dissipa com segurança.</p>
+        <p class="pros"><b>+</b> Simples de implementar, ótimo game feel, cria decisão a cada segundo.</p>
+        <p class="cons"><b>−</b> Pode virar “mantenha sempre no verde” se mal balanceado.</p>
+      </article>
+
+      <article class="card">
+        <span class="tag">Opção C</span>
+        <h3>Religar a luz</h3>
+        <p>O mapa tem uma rede elétrica quebrada (transformadores, quadros). Consertar dá buff de área, torreta ou recompensa. É um objetivo opcional durante a run.</p>
+        <p class="pros"><b>+</b> Quebra a monotonia de “só sobreviver” e puxa o tema do ofício.</p>
+        <p class="cons"><b>−</b> Exige mapa mais desenhado e objetivos legíveis.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section id="sistema">
+    <h2><span class="num">04</span> Sistema elétrico</h2>
+    <p class="sub">As regras que dão profundidade e permitem builds criativos.</p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Condutividade</h3>
+        <p>Inimigo molhado ou metálico conduz mais, então o raio encadeia mais longe. Inimigo de borracha ou isolado resiste.</p>
+        <h3>Clima</h3>
+        <p>Chuva aumenta a condutividade (mais poder, mais risco). Tempestade chama raios do céu.</p>
+      </div>
+      <div class="card">
+        <h3>HP como Disjuntor</h3>
+        <p>A vida é uma fila de <strong>disjuntores</strong>. Ao zerar um, ele “desarma”: invulnerabilidade curta + reset. <strong>Fusíveis</strong> funcionam como vidas extras. É uma “skin” temática de HP/revive.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px">Status elétricos</h3>
+    <ul class="status-list">
+      <li><b>Paralisia</b> · atordoa</li>
+      <li><b>Marcado</b> · o próximo dano elétrico explode</li>
+      <li><b>Magnetizado</b> · puxa / atrai</li>
+      <li><b>Condutor</b> · vira nó da corrente</li>
+      <li><b>Curto</b> · inimigo perde a habilidade especial</li>
+    </ul>
+
+    <h3>Sinergias entre elementos <span class="chip" style="margin-left:6px">estilo Noita</span></h3>
+    <ul>
+      <li><strong>Água + elétrico</strong> = cadeia ampliada (e você também leva se estiver na poça).</li>
+      <li><strong>Óleo / gás + faísca</strong> = fogo.</li>
+      <li><strong>Metal + ímã</strong> = puxão em grupo.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section id="armas">
+    <h2><span class="num">05</span> Ferramentas (armas)</h2>
+    <p class="sub">Lista inicial para discutir. Cada ferramenta evolui combinando com uma passiva, como em Vampire Survivors.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ferramenta</th><th>Comportamento</th><th>Evolução (arma + passiva)</th></tr></thead>
+        <tbody>
+          <tr><td>Alicate Eletrificado</td><td>Golpe em arco corpo a corpo, aplica Paralisia.</td><td>+ Luva Isolante → <span class="evo">Alicate Titã</span></td></tr>
+          <tr><td>Extensão Elétrica</td><td>Fio que liga até N inimigos; a corrente corre entre eles.</td><td>+ Tomada T → <span class="evo">Rede Trifásica</span></td></tr>
+          <tr><td>Bobina de Tesla</td><td>Aura pulsante de dano ao redor.</td><td>+ Transformador → <span class="evo">Torre Tesla</span></td></tr>
+          <tr><td>Fusível / Disjuntor</td><td>Granada: explode e causa mini-apagão (stun em área).</td><td>+ Capacitor → <span class="evo">Quadro de Força</span></td></tr>
+          <tr><td>Raio de Tempestade</td><td>Raios aleatórios do céu (melhor sob chuva).</td><td>+ Para-raios → <span class="evo">Tempestade Perfeita</span></td></tr>
+          <tr><td>Multímetro</td><td>Marca inimigos e revela o ponto fraco (crítico).</td><td>+ Fio de cobre → <span class="evo">Osciloscópio</span></td></tr>
+          <tr><td>Furadeira</td><td>Perfura em linha, curto alcance, muito dano.</td><td>+ Bateria → <span class="evo">Marteleta Industrial</span></td></tr>
+          <tr><td>Capacitor</td><td>Armazena dano e libera em rajada atrasada.</td><td>+ Gerador → <span class="evo">Banco de Capacitores</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="margin-top:20px">Passivas</h3>
+    <ul class="status-list">
+      <li>Luvas isolantes · resistência</li>
+      <li>Capacete / EPI · HP</li>
+      <li>Bota de borracha · imune a choque de poça</li>
+      <li>Bateria · cooldown</li>
+      <li>Fio de cobre · + cadeias</li>
+      <li>Transformador · dano</li>
+      <li>Gerador · regeneração</li>
+      <li>Ímã · alcance de coleta</li>
+      <li>Fita isolante · duração / escudo</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section id="inimigos">
+    <h2><span class="num">06</span> Inimigos</h2>
+    <p class="sub">Dependem do tom que escolhermos. Seguem três direções possíveis.</p>
+
+    <div class="grid g3 tone">
+      <div class="card">
+        <span class="tag">Tom 1</span>
+        <h3>Cômico / brasileiro</h3>
+        <ul>
+          <li>Ratos que roem fio</li>
+          <li>Pombos de poste</li>
+          <li>Ladrões de fio de cobre</li>
+          <li>Fiscais da concessionária</li>
+          <li>Vizinho reclamando</li>
+          <li>“Gatos” (ligação clandestina) ambulantes</li>
+        </ul>
+        <p class="boss"><strong>Boss:</strong> Síndico Supremo / Cabo de alta tensão vivo</p>
+      </div>
+      <div class="card">
+        <span class="tag">Tom 2</span>
+        <h3>Terror</h3>
+        <ul>
+          <li>Sombras que devoram luz</li>
+          <li>Vultos de eletricistas mortos</li>
+          <li>Entidade do Apagão</li>
+        </ul>
+        <p class="boss"><strong>Boss:</strong> O Grande Apagão</p>
+      </div>
+      <div class="card">
+        <span class="tag">Tom 3</span>
+        <h3>Sci-fi</h3>
+        <ul>
+          <li>Drones</li>
+          <li>Robôs de manutenção hostis</li>
+          <li>IA da rede elétrica</li>
+        </ul>
+        <p class="boss"><strong>Boss:</strong> Super-IA da subestação</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:20px">Comportamentos (independem do tom)</h3>
+    <ul class="status-list">
+      <li><b>Enxame</b> · muitos e fracos</li>
+      <li><b>Tanque</b> · lento e resistente</li>
+      <li><b>Atirador</b> · ataca à distância</li>
+      <li><b>Ladrão de carga</b> · drena sua Tensão</li>
+      <li><b>Isolante</b> · imune a choque, pede outra arma</li>
+      <li><b>Invocador</b> · chama reforços</li>
+    </ul>
+  </section>
+
+  <!-- 7 -->
+  <section id="eventos">
+    <h2><span class="num">07</span> Eventos e mapas</h2>
+    <div class="grid g3">
+      <div class="card">
+        <h3>Apagão</h3>
+        <p>A tela escurece e só se enxerga perto de fontes elétricas. O spawn aumenta, e o dano elétrico também.</p>
+      </div>
+      <div class="card">
+        <h3>Surto de tensão</h3>
+        <p>Por 20 s tudo é amplificado, para o jogador e para os inimigos.</p>
+      </div>
+      <div class="card">
+        <h3>Gato <span class="chip" style="margin-left:4px">tom cômico</span></h3>
+        <p>Item arriscado (ligação clandestina): buff enorme, mas atrai a “fiscalização”.</p>
+      </div>
+    </div>
+    <div class="callout cy">
+      <strong>Progressão de mapas</strong>
+      Casa residencial → prédio → fábrica → subestação → cidade em apagão.
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section id="meta">
+    <h2><span class="num">08</span> Meta-progressão</h2>
+    <div class="grid g3">
+      <div class="card">
+        <h3>Oficina / Van</h3>
+        <p>Gasta moeda em upgrades permanentes: ferramentas, EPI, slots de disjuntor.</p>
+      </div>
+      <div class="card">
+        <h3>Personagens</h3>
+        <p>Aprendiz, instalador residencial, <strong>linha viva</strong> (trabalha em rede energizada) e engenheiro eletricista. Cada um com ferramenta e passiva inicial únicas.</p>
+      </div>
+      <div class="card">
+        <h3>Contratos</h3>
+        <p>Modificadores opcionais (mais chuva, sem aterramento, só 1 disjuntor) em troca de recompensa maior.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section id="mvp">
+    <h2><span class="num">09</span> Escopo sugerido do MVP</h2>
+    <p class="sub">O mínimo para “provar a diversão” antes de investir em conteúdo.</p>
+    <div class="grid g4">
+      <div class="card stat"><div class="big">1</div><div class="lbl">personagem</div></div>
+      <div class="card stat"><div class="big">1</div><div class="lbl">mapa</div></div>
+      <div class="card stat"><div class="big">6 + 6</div><div class="lbl">armas + passivas</div></div>
+      <div class="card stat"><div class="big">8</div><div class="lbl">tipos de inimigos</div></div>
+      <div class="card stat"><div class="big">2</div><div class="lbl">bosses</div></div>
+      <div class="card stat"><div class="big">1</div><div class="lbl">evento (Apagão)</div></div>
+      <div class="card stat"><div class="big">3–5</div><div class="lbl">upgrades permanentes</div></div>
+      <div class="card stat"><div class="big">200+</div><div class="lbl">inimigos na tela (teste técnico)</div></div>
+    </div>
+
+    <h3 style="margin-top:20px">Como validar depois da reunião</h3>
+    <ul>
+      <li><strong>Teste de papel:</strong> simular uma run de 15 min só com a lista de armas e inimigos. Existe uma decisão interessante a cada level up?</li>
+      <li><strong>Protótipo “greybox” (1–2 semanas):</strong> movimento, 1 ferramenta com cadeia de raio, barra de Tensão e 1 inimigo em enxame. Critério: os primeiros 5 minutos já são divertidos, sem arte nem meta-progressão.</li>
+      <li><strong>Playtest com 3–5 pessoas:</strong> perguntar “o que você faria para ficar mais forte?”. Se a resposta envolve tensão, circuito ou condutividade, o diferencial está comunicando.</li>
+    </ul>
+
+    <h3>Pendências técnicas (não bloqueiam a conversa)</h3>
+    <ul>
+      <li><strong>Engine:</strong> Godot 4 (leve, 2D excelente, gratuito) ou Unity, conforme a familiaridade.</li>
+      <li><strong>Arte:</strong> pixel art 16/32 bits é o padrão sugerido (barato de produzir e combina com o gênero).</li>
+    </ul>
+  </section>
+
+  <!-- 10 -->
+  <section id="perguntas">
+    <h2><span class="num">10</span> Perguntas para decidirmos juntos</h2>
+    <p class="sub">Pauta sugerida para a conversa.</p>
+
+    <ol class="questions">
+      <li><strong>Tom:</strong> cômico/brasileiro, terror ou sci-fi?
+        <span class="hint">Define inimigos, arte e nomes.</span></li>
+      <li><strong>Assinatura:</strong> apostamos em circuitos (A), tensão (B), religar a luz (C) ou numa combinação?</li>
+      <li><strong>Profundidade × legibilidade:</strong> quantas regras elétricas o jogador deve entender na primeira hora?</li>
+      <li><strong>HP em disjuntores:</strong> funciona ou confunde?</li>
+      <li><strong>Escopo do MVP:</strong> quantas armas, inimigos e mapas bastam para provar a diversão?</li>
+      <li><strong>Diferencial comercial:</strong> o que faz alguém escolher este jogo em vez de Vampire Survivors?
+        <span class="hint">Hoje: sistema elétrico + identidade do ofício.</span></li>
+      <li><strong>Meta-progressão:</strong> vertical (upgrades) ou horizontal (desbloqueios)?</li>
+    </ol>
+
+    <h3>Roteiro de 60 minutos</h3>
+    <ol class="timeline">
+      <li><span class="min">10 min</span>Pilares</li>
+      <li><span class="min">10 min</span>Tom</li>
+      <li><span class="min">20 min</span>Mecânica-assinatura</li>
+      <li><span class="min">10 min</span>Armas e sinergias</li>
+      <li><span class="min">10 min</span>Escopo do MVP</li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Survivor do Eletricista · Proposta de mecânicas v0.1 · Material de discussão, sujeito a mudanças.
+  </div>
+</footer>
+
+</body>
+</html>
